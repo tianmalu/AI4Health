@@ -1,0 +1,9 @@
+/ComParE2017_Cold_4students
+/ppl_dataset
+/embeddings_ppl
+*.csv
+*.png
+*.jpg
+*.jpeg
+*.pdf
+*.pth
