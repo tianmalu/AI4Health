@@ -7,3 +7,4 @@
 *.jpeg
 *.pdf
 *.pth
+.env
