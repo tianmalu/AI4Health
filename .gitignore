@@ -1,6 +1,7 @@
 /ComParE2017_Cold_4students
 /ppl_dataset
 /embeddings_ppl
+/embeddings
 *.csv
 *.png
 *.jpg
@@ -9,3 +10,4 @@
 *.pth
 .env
 /.ipynb_checkpoints
+/embeddings_original

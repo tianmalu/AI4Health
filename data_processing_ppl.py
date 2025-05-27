@@ -56,7 +56,7 @@ def loudness_normalization(y, sr, target_db=-23.0):
 
     
 if __name__ == "__main__":
-    file_path = './ComParE2017_Cold_4students/wav/test_files' # Path to the directory containing wav files
+    file_path = './ComParE2017_Cold_4students/wav/train_files' # Path to the directory containing wav files
     folder_name = ''
     out_dir = './processed_files'  # Output directory for processed files
 
