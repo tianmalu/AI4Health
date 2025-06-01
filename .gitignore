@@ -8,6 +8,8 @@
 *.jpeg
 *.pdf
 *.pth
+*.npy
 .env
 /.ipynb_checkpoints
 /embeddings_original
+/spectrogram_images
