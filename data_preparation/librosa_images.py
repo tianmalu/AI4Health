@@ -12,44 +12,57 @@ matplotlib.use('Agg')
 
 def compute_spectrogram_image(file_path, output_dir, filename):
     try:
-        y, sr = librosa.load(file_path, sr=22050) 
+        y, sr = librosa.load(file_path, sr=None)  # 使用原始采样率
         
         S = librosa.feature.melspectrogram(
             y=y, 
             sr=sr,
             n_mels=128,       
-            fmax=8000,        
+            fmax=min(8000, sr//2),        
             hop_length=512,    
             n_fft=2048       
         )
         
         log_S = librosa.power_to_db(S, ref=np.max)
         
-        numpy_output_path = os.path.join(output_dir, f"{os.path.splitext(filename)[0]}_logmel.npy")
-        np.save(numpy_output_path, log_S)
         
-        plt.figure(figsize=(10, 4))
-        librosa.display.specshow(
+        fig_width = 10  # 图像宽度
+        fig_height = 3  # 图像高度
+        dpi = 100       # 分辨率
+        
+        fig = plt.figure(figsize=(fig_width, fig_height), dpi=dpi)
+        ax = fig.add_subplot(111)
+        
+        # 🔧 移除所有边距和轴
+        ax.set_position([0, 0, 1, 1])  # 占满整个图像
+        ax.axis('off')  # 关闭坐标轴
+        
+        # 显示谱图（不显示坐标轴和标签）
+        im = ax.imshow(
             log_S, 
-            x_axis='time', 
-            y_axis='mel', 
-            sr=sr,
-            fmax=8000,
-            cmap='viridis'
+            aspect='auto', 
+            origin='lower',
+            cmap='viridis',
+            interpolation='nearest'
         )
-        plt.colorbar(format='%+2.0f dB')
-        plt.title(f'Log-Mel Spectrogram: {filename}')
-        plt.tight_layout()
         
+        # 🔧 保存纯谱图图像
         image_output_path = os.path.join(output_dir, f"{os.path.splitext(filename)[0]}_logmel.png")
-        plt.savefig(image_output_path, dpi=150, bbox_inches='tight')
+        plt.savefig(
+            image_output_path, 
+            dpi=dpi,
+            bbox_inches='tight',
+            pad_inches=0,      # 🔧 移除所有留白
+            facecolor='black', # 背景色
+            edgecolor='none'
+        )
         plt.close() 
         
         return {
             'image_path': image_output_path,
-            'numpy_path': numpy_output_path,
             'shape': log_S.shape,
-            'duration': len(y) / sr
+            'duration': len(y) / sr,
+            'image_size': f"{fig_width*dpi}x{fig_height*dpi}"  # 记录图像像素大小
         }
         
     except Exception as e:
@@ -71,7 +84,7 @@ def process_audio_file(args):
     return result
 
 if __name__ == "__main__":
-    data_split = ["train_files", "test_files", "devel_files"]  # 改为正确的文件夹名
+    data_split = ["train_files", "test_files", "devel_files"]
     audio_dir = "./ComParE2017_Cold_4students/wav"
     
     for split in data_split:
@@ -141,11 +154,15 @@ if __name__ == "__main__":
         print(f"\n📊 Split distribution:")
         print(df['split'].value_counts())
         
+        # 🔧 显示图像尺寸统计
+        print(f"\n🖼️ Image sizes:")
+        print(df['image_size'].value_counts())
+        
         shapes = df['shape'].apply(lambda x: f"{x[0]}x{x[1]}").value_counts()
         print(f"\n🔲 Spectrogram shapes:")
         print(shapes.head())
     
     print(f"\n📁 Output saved to: {os.path.abspath('spectrogram_images/log_mel')}")
     print(f"🎯 Each file generated:")
-    print(f"   - PNG image for visualization")
+    print(f"   - PNG image: 1000x300 pixels (pure spectrogram)")
     print(f"   - NPY array for ML processing")
