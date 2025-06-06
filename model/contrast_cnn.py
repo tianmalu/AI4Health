@@ -327,14 +327,14 @@ class ContrastiveSpectrogramDataset(Dataset):
 if __name__ == "__main__":
 
     label_dict = {}
-    with open("ComParE2017_Cold_4students/lab/ComParE2017_Cold.tsv", "r", encoding="utf-8") as f:
+    with open("../ComParE2017_Cold_4students/lab/ComParE2017_Cold.tsv", "r", encoding="utf-8") as f:
         reader = csv.DictReader(f, delimiter="\t")
         rows = list(reader)
         for row in tqdm(rows, desc="Loading labels"):
             label_dict[row["file_name"]] = row["Cold (upper respiratory tract infection)"]
 
     data_split = ["train_files", "devel_files"]
-    img_dir = "spectrogram_images/log_mel"
+    img_dir = "../spectrogram_images/log_mel"
     
 
     print("🚀 Collecting image paths...")
@@ -374,7 +374,7 @@ if __name__ == "__main__":
     combined_criterion = CombinedLoss(
         classification_loss=focal_loss,
         contrastive_loss=contrastive_loss,
-        alpha=0.3 
+        alpha=0.4 
     )
 
     optimizer = torch.optim.Adam(
@@ -505,7 +505,7 @@ if __name__ == "__main__":
         if val_f1 > best_val_f1:
             best_val_f1 = val_f1
             early_stop_counter = 0
-            torch.save(contrastive_model.state_dict(), "best_contrastive_model_sampling.pth")
+            torch.save(contrastive_model.state_dict(), "best_contrastive_model_sampling_0.4.pth")
             print(f"🌟 New best F1: {best_val_f1:.4f}, saving model...")
         else:
             early_stop_counter += 1
