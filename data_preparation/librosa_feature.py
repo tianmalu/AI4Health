@@ -24,23 +24,23 @@ def extract_audio_features_mp(file_info):
         features = {
             'filename': filename,
             'split': split,
-            'file_path': file_path,
             'duration': len(y) / sr,
-            'sample_rate': sr
         }
         
-        for i in range(mfccs.shape[0]):
-            features[f'mfcc_{i}_mean'] = np.mean(mfccs[i])
-            features[f'mfcc_{i}_std'] = np.std(mfccs[i])
+        # 简化的MFCC特征 - 只计算整体的均值和标准差
+        features['mfcc_mean'] = np.mean(mfccs)
+        features['mfcc_std'] = np.std(mfccs)
         
-        for i in range(chroma.shape[0]):
-            features[f'chroma_{i}_mean'] = np.mean(chroma[i])
-            features[f'chroma_{i}_std'] = np.std(chroma[i])
+        # 简化的Chroma特征 - 只计算整体的均值和标准差
+        features['chroma_mean'] = np.mean(chroma)
+        features['chroma_std'] = np.std(chroma)
         
+        # 保留Spectral Contrast的分层处理（因为维度较少）
         for i in range(spectral_contrast.shape[0]):
             features[f'spectral_contrast_{i}_mean'] = np.mean(spectral_contrast[i])
             features[f'spectral_contrast_{i}_std'] = np.std(spectral_contrast[i])
         
+        # 其他特征保持不变
         features['spectral_flatness_mean'] = np.mean(spec_flat)
         features['spectral_flatness_std'] = np.std(spec_flat)
         features['onset_strength_mean'] = np.mean(onset_env)
@@ -62,7 +62,7 @@ if __name__ == "__main__":
     mp.set_start_method('spawn', force=True)
     
     data_split = ['train_files', 'test_files', 'devel_files']
-    folder_path = 'ComParE2017_Cold_4students/wav/'
+    folder_path = '../ComParE2017_Cold_4students/wav/'
     
     all_file_info = []
     for split in data_split:
@@ -91,9 +91,10 @@ if __name__ == "__main__":
     
     if all_features:
         df = pd.DataFrame(all_features)
-        output_file = 'audio_features_parallel.csv'
+        output_file = 'audio_features_simplified.csv'
         df.to_csv(output_file, index=False)
         print(f"✅ Features saved to {output_file}")
         print(f"📊 Dataset shape: {df.shape}")
+        print(f"📊 Feature columns: {list(df.columns)}")
     else:
         print("❌ No features extracted!")

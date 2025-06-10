@@ -374,7 +374,7 @@ if __name__ == "__main__":
     combined_criterion = CombinedLoss(
         classification_loss=focal_loss,
         contrastive_loss=contrastive_loss,
-        alpha=0.4 
+        alpha=0.5 
     )
 
     optimizer = torch.optim.Adam(
@@ -505,7 +505,7 @@ if __name__ == "__main__":
         if val_f1 > best_val_f1:
             best_val_f1 = val_f1
             early_stop_counter = 0
-            torch.save(contrastive_model.state_dict(), "best_contrastive_model_sampling_0.4.pth")
+            torch.save(contrastive_model.state_dict(), "best_contrastive_model_sampling_0.5.pth")
             print(f"🌟 New best F1: {best_val_f1:.4f}, saving model...")
         else:
             early_stop_counter += 1
