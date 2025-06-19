@@ -12,7 +12,7 @@ matplotlib.use('Agg')
 
 def compute_spectrogram_image(file_path, output_dir, filename):
     try:
-        y, sr = librosa.load(file_path, sr=None)  # 使用原始采样率
+        y, sr = librosa.load(file_path, sr=None) 
         
         S = librosa.feature.melspectrogram(
             y=y, 

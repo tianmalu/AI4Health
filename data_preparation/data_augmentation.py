@@ -89,13 +89,12 @@ def check_image_sizes(image_paths):
 
 
 if __name__ == "__main__":
-    """
     print("📊 Loading labels...")
     label_dict = read_labels("../ComParE2017_Cold_4students/lab/ComParE2017_Cold.tsv")
     print(f"Loaded {len(label_dict)} labels")
     
     data_split = ["train_files", "devel_files"]
-    image_dir = "../spectrogram_images/log_mel"
+    image_dir = "../spectrograms_variable_width"
     
     results = []
     
@@ -127,9 +126,3 @@ if __name__ == "__main__":
         print(f"🎯 Generated {augmented_count} flipped images for cold samples")
     else:
         print("❌ No files processed")
-    """
-
-    image_dir = "../spectrogram_images/log_mel/devel_files"
-    image_list = glob.glob(os.path.join(image_dir, "*.png"))
-
-    check_image_sizes(image_list)
