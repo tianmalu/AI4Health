@@ -716,11 +716,13 @@ def create_multimodal_features_with_addition(embeddings_dict, physical_features_
             physical_padded = np.zeros(acoustic_dim, dtype=np.float32)
             physical_padded[:physical_dim] = physical
             combined = acoustic + physical_padded
+            print(f"📏 Padded physical features from {physical_dim} to {acoustic_dim}")
         elif physical_dim > acoustic_dim:
             # Pad acoustic features to match physical dimension
             acoustic_padded = np.zeros(physical_dim, dtype=np.float32)
             acoustic_padded[:acoustic_dim] = acoustic
             combined = acoustic_padded + physical
+            print(f"📏 Padded acoustic features from {acoustic_dim} to {physical_dim}")
         else:
             # Dimensions match, direct addition
             combined = acoustic + physical
@@ -818,8 +820,8 @@ if __name__ == "__main__":
     train_embeddings_dict = load_acoustic_embeddings(os.path.join(embedding_dir, "train_files"))
     
     # Create multimodal features
-    combined_train_features = create_multimodal_features_with_addition(train_embeddings_dict, physical_features_df)
-    combined_val_features = create_multimodal_features_with_addition(val_embeddings_dict, physical_features_df)
+    combined_train_features = create_multimodal_features_with_concatenate(train_embeddings_dict, physical_features_df)
+    combined_val_features = create_multimodal_features_with_concatenate(val_embeddings_dict, physical_features_df)
     # combined_train_features = create_multimodal_features_with_addition(train_embeddings_dict, physical_features_df)
     # combined_val_features = create_multimodal_features_with_addition(val_embeddings_dict, physical_features_df)
     
@@ -828,8 +830,8 @@ if __name__ == "__main__":
     print(f"Combined validation features: {len(combined_val_features)} files")  
     
     # Create datasets
-    train_dataset = ColdDetectionDataset(combined_train_features, label_dict, label_ratio= 10 )
-    val_dataset = ColdDetectionDataset(combined_val_features, label_dict, label_ratio = 15)
+    train_dataset = ColdDetectionDataset(combined_train_features, label_dict, label_ratio=6)
+    val_dataset = ColdDetectionDataset(combined_val_features, label_dict, label_ratio=15)
     
     print(f"Train dataset size: {len(train_dataset)} samples")
     print(f"Validation dataset size: {len(val_dataset)} samples")
@@ -846,9 +848,9 @@ if __name__ == "__main__":
     input_dim = next(iter(train_loader))[0].shape[1]
     hidden_dim = 1024
     embedding_dim = 256
-    num_embeddings = 2
+    num_embeddings = 3
     num_classes = 2  # Healthy (HC) and Pathological (PC)
-    num_epochs = 200
+    num_epochs = 100
     early_stopping_patience = 30
 
     print(f"🤖 Model Configuration:")
@@ -881,7 +883,7 @@ if __name__ == "__main__":
         train_loader, 
         val_loader, 
         num_epochs, 
-        lr=5e-5, 
+        lr=5e-6, 
         device=device, 
         save_path=save_path,
         early_stopping_patience=early_stopping_patience

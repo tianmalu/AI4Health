@@ -269,10 +269,6 @@ class ColdDetectionDataset(Dataset):
         return stats
 
 class FocalLoss(nn.Module):
-    """
-    Focal Loss: 专门用于处理类别不平衡问题
-    论文: https://arxiv.org/abs/1708.02002
-    """
     def __init__(self, alpha=1, gamma=2, weight=None, ignore_index=-100, size_average=True):
         super(FocalLoss, self).__init__()
         self.alpha = alpha
@@ -282,10 +278,6 @@ class FocalLoss(nn.Module):
         self.size_average = size_average
 
     def forward(self, inputs, targets):
-        """
-        inputs: (N, C) where C = 类别数
-        targets: (N,) where each value is 0 <= targets[i] <= C-1
-        """
         ce_loss = F.cross_entropy(
             inputs, targets, reduction='none', 
             weight=self.weight, ignore_index=self.ignore_index
@@ -387,7 +379,7 @@ def train_supervised_vqvae(model, train_loader, val_loader, num_epochs=100, lr=1
     Loss = α*L_recon + β*L_VQ + γ*L_classification
     """
     
-    optimizer = optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-8)
+    optimizer = optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-6)
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.8, patience=8)
     
     # 损失函数
@@ -396,7 +388,7 @@ def train_supervised_vqvae(model, train_loader, val_loader, num_epochs=100, lr=1
     criterion_class = FocalLoss(
         alpha=2.0,  # 增加alpha，更关注难分类样本
         gamma=3.0,  # 增加gamma，更强调困难样本
-        weight=torch.tensor([1.0, 6.0]).to(device)  # 大幅增加PC类权重
+        weight=torch.tensor([1.0, 5.0]).to(device)  # 大幅增加PC类权重
     )
     
     # 🔧 优化损失权重 - 进一步强调分类！
